@@ -25,19 +25,6 @@ while True:
         time.sleep(2)
 
 
-my_posts = [{"id" : 1, "title" : "Dummy Post", "content" : "This is a dummy post", "rating" : 4}, {"id" : 2, "title" : "This is gonna get deleted", "content" : "Don't delete me ):"}]
-
-def find_post(id : int):
-    for p in my_posts:
-        if p["id"] == id:
-            return p
-        
-
-def find_post_index(id : int):
-    for i, p in enumerate(my_posts):
-        if p["id"] == id:
-            return i
-
 
 @app.get("/")
 async def root():
@@ -93,8 +80,6 @@ async def delete_post(id : int):
 
 @app.put("/posts/{id}")
 async def update_post(id : int, post : Post):
-    index = find_post_index(id)
-
     cursor.execute('''UPDATE posts SET title = %s, content = %s, published = %s WHERE id = %s RETURNING *''', (post.title, post.content, post.published, str(id)))
     updated_post = cursor.fetchone()
     conn.commit()
