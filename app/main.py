@@ -33,6 +33,9 @@ while True:
 async def root():
     return {"message" : "API is active"}
 
+
+# ----------------------------POSTS--------------------------------------------------------------------------------------#
+
 # GET ALL POSTS
 @app.get("/posts/all", response_model=List[schemas.PostResponse])
 async def get_all_posts(db : Session = Depends(get_db)):
@@ -110,6 +113,16 @@ async def update_post(id : int, post : schemas.PostCreate, db : Session = Depend
     return post_query.first()
 
 
+#----------------------------------------USERS-------------------------------------------------------------------#
+
+@app.post("/users", status_code = status.HTTP_201_CREATED, response_model=schemas.UserOut)
+async def create_user(user : schemas.UserCreate, db : Session = Depends(get_db)):
+    new_user = models.User(**user.model_dump())
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+
+    return new_user
 
 
 #5:50:00
