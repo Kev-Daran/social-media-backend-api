@@ -1,3 +1,4 @@
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from .. import models, schemas, oauth2
 from ..database import get_db
@@ -11,7 +12,7 @@ router = APIRouter(
 
 
 # GET ALL POSTS
-@router.get("/all", response_model=List[schemas.PostResponse])
+@router.get("/all", response_model=List[schemas.PostOut])
 async def get_all_posts(db : Session = Depends(get_db), 
                         user_id : int = Depends(oauth2.get_current_user), 
                         limit : int = 10, 
@@ -19,17 +20,28 @@ async def get_all_posts(db : Session = Depends(get_db),
                         search : Optional[str] = ""):
     #cursor.execute('''SELECT * FROM posts''')
     #posts = cursor.fetchall()
-    posts = db.query(models.Post).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
-    return posts
+    #posts = db.query(models.Post).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
+
+    results = db.query(models.Post, func.count(models.Votes.post_id).label("votes")).join(
+        models.Votes, models.Votes.post_id == models.Post.id).group_by(models.Post.id).filter(
+            models.Post.title.contains(search)).limit(limit).offset(skip).all()
+    
+    #results = list(map(lambda x : x._mapping, results)) ------------> IMPORTANT : TO CHECK THE SHAPE OF JSON BEING RETURNED, NEED TO RUN A LAMBDA FUNCTION TO APPLY ._MAPPING TO EACH ITERABLE
+
+    return results
 
 # GET SINGLE POST
-@router.get("/{id}", response_model=schemas.PostResponse)
+@router.get("/{id}", response_model=schemas.PostOut)
 async def get_single_post(id : int, db : Session = Depends(get_db), user_id : int = Depends(oauth2.get_current_user)):
 
     # cursor.execute('''SELECT * FROM posts WHERE id = %s ''', (str(id),))
     # post = cursor.fetchone()
 
-    post = db.query(models.Post).filter(models.Post.id == id).first()
+    #post = db.query(models.Post).filter(models.Post.id == id).first()
+
+    post = db.query(models.Post, func.count(models.Post.id).label("votes")).join(
+        models.Votes, models.Votes.post_id == models.Post.id).group_by(models.Post.id).filter(models.Post.id == id).first()
+    
     if not post:
         raise HTTPException(status.HTTP_404_NOT_FOUND, 
                             detail = f"Post with id: {id} not found!")
