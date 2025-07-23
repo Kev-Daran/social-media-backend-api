@@ -1,4 +1,5 @@
 from pydantic_settings import BaseSettings
+from pathlib import Path
 
 class Settings(BaseSettings):
     database_username : str
@@ -11,7 +12,7 @@ class Settings(BaseSettings):
     access_token_expire_minutes : int
 
     class Config:
-        env_file = ".env"
+        env_file = Path(__file__).parent / ".env"          # IMPORTANT: NOT HAVING EXACT FILE LOCATION WILL MESS UP ALEMBIC MIGRATIONS
 
 
 settings = Settings()
