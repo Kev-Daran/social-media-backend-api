@@ -3,7 +3,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from app.config import settings
 from app.main import app
-from app import schemas
 from app.database import get_db, Base
 import pytest
 
@@ -13,7 +12,7 @@ engine = create_engine(SQL_ALCHEMY_DATABASE_URL)
 
 TestSessionLocal = sessionmaker(autoflush=False, autocommit=False, bind=engine)
 
-@pytest.fixture
+@pytest.fixture()
 def session():
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
@@ -23,7 +22,7 @@ def session():
     finally:
         db.close()
 
-@pytest.fixture
+@pytest.fixture()
 def client(session):
     def override_get_db():
         try:
