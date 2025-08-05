@@ -1,18 +1,7 @@
 from app import schemas
-from .database import client, session
-import pytest
 from app.config import settings
 from jose import jwt
-
-@pytest.fixture
-def test_user(client):
-    new_user = {"email" : "testuser@gmail.com", "password" : "testuserpassword"}
-    res = client.post("/users/", json=new_user)
-
-    assert res.status_code == 201
-    user_data = res.json()
-    user_data["password"] = new_user["password"]
-    return user_data
+import pytest
 
 
 def test_root(client):
@@ -39,3 +28,15 @@ def test_login_user(client, test_user):
     assert payload.get("user_id") == test_user["id"]
     assert token_data.token_type == "bearer"
     assert res.status_code == 200
+
+@pytest.mark.parametrize("email, password, status_code", [
+    ("wrongemail@gmail.com", "testuserpassword", 403),
+    ("testuser@gmail.com", "wrongpassword", 403),
+    ("wrongemail@gmail.com", "wrongpassword", 403),
+    (None, "testuserpassword", 403),
+    ("testuser@gmail.com", None, 403) #oauth2 is converting None to "None" so its following original code logic
+])
+def test_incorrect_login(client, test_user, email, password, status_code):
+    res = client.post("/login", data={"username" : email, "password" : password})
+
+    assert res.status_code == status_code

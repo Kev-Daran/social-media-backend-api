@@ -22,7 +22,7 @@ async def get_all_posts(db : Session = Depends(get_db),
     #posts = cursor.fetchall()
     #posts = db.query(models.Post).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
 
-    results = db.query(models.Post, func.count(models.Votes.post_id).label("votes")).join(
+    results = db.query(models.Post, func.count(models.Votes.post_id).label("votes")).outerjoin(
         models.Votes, models.Votes.post_id == models.Post.id).group_by(models.Post.id).filter(
             models.Post.title.contains(search)).limit(limit).offset(skip).all()
     
@@ -39,7 +39,7 @@ async def get_single_post(id : int, db : Session = Depends(get_db), user_id : in
 
     #post = db.query(models.Post).filter(models.Post.id == id).first()
 
-    post = db.query(models.Post, func.count(models.Post.id).label("votes")).join(
+    post = db.query(models.Post, func.count(models.Post.id).label("votes")).outerjoin(
         models.Votes, models.Votes.post_id == models.Post.id).group_by(models.Post.id).filter(models.Post.id == id).first()
     
     if not post:
