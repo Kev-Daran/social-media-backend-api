@@ -32,7 +32,6 @@ app.include_router(auth.router)
 app.include_router(vote.router)
 
 
-# 17:44:00
 
 
 
