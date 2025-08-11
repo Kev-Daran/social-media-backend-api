@@ -4,6 +4,15 @@ on: [push, pull_request]
 
 jobs:
     job1:
+        env:
+            DATABASE_HOSTNAME: localhost
+            DATABASE_USERNAME: postgres
+            DATABASE_PORT: 5432
+            DATABASE_PASSWORD: password
+            DATABASE_NAME: fastapi
+            SECRET_KEY: 5MYVjL3tVDMjBFlKOSt5lYzVM1KTF8oq
+            ALGORITHM: HS256
+            ACCESS_TOKEN_EXPIRE_MINUTES: 60
         runs-on: ubuntu-latest
         steps:
             - name: pulling git repo
