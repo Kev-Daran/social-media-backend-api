@@ -1,6 +1,6 @@
 # FastAPI Social Media API
 
-A robust REST API built with FastAPI for a social media platform featuring user authentication, post management, and voting functionality.
+A REST API built with FastAPI for a social media platform featuring user authentication, post management, and voting functionality.
 
 ## Features
 
