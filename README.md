@@ -76,7 +76,7 @@ A REST API built with FastAPI for a social media platform featuring user authent
 1. **Clone the repository**
    ```bash
    git clone https://github.com/Kev-Daran/social-media-backend-api.git
-   cd fastapi-social-media-api
+   cd social-media-backend-api
    ```
 
 2. **Create virtual environment**
